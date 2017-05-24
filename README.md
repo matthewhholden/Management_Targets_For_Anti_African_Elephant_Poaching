@@ -1,4 +1,4 @@
-# Management_Targets_For_Anti_African_Poaching
+# Management Targets For Anti African Poaching
 
 The files allow one to reproduce the work in manuscript
 "Management Targets to Save the African Elephant From Poaching"
