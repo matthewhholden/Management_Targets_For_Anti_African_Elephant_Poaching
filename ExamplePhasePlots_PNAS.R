@@ -159,7 +159,10 @@ for(j in 1:numb){
   ind2SQ = which( categories.SQ == 2, arr.ind=TRUE );
   ind3SQ = which( categories.SQ == 3, arr.ind=TRUE );
 
-
+#uncomment this code to plot the nullclines of all studies for all scenarios. There 
+#are only 5 possibible combinations of roots and there stability. You can inspect
+#These graphs to pick the cases that illustrate the type of dynamic behavior.
+  
   # Plot.all.types(l=dim(ind1M)[1], ind1M, ty = 1, blim = c(6,7), strat = 'M')
   # dev.off(dev.list()["RStudioGD"])
   # Plot.all.types(l=dim(ind2M)[1], ind2M, ty = 2, blim = c(6,7), 'M')
@@ -175,30 +178,35 @@ for(j in 1:numb){
   # Plot.all.types(dim(ind4FE)[1], ind4FE, 4, blim = c(6,7), 'FE')
   # Plot.all.types(dim(ind5FE)[1], ind5FE, 5, blim = c(1,9), 'FE')
 
-## Plot the Phase planes of typical examples ####
+## Plot the Phase planes of typical examples (by simulating the ODES ) ####
 
-ind.typical.FE = matrix( c(72, 7,
-                       962, 7,
-                       495,7,
-                       772,7,
-                       313, 9), 5, 2, byrow=TRUE)
+#indeces of typical examples - choose them from visually inspecting the
+#roots from the indeces provided above (by plotting the nullclines - see
+#commented out code above)
+  
+  ind.typical.FE = matrix( c(72, 7,
+                         962, 7,
+                         495,7,
+                         772,7,
+                         313, 9), 5, 2, byrow=TRUE)
+  
+  ind.typical.M = matrix( c(313, 7,
+                             515, 7,
+                             818,7,
+                             327,4), 4, 2, byrow=TRUE)
 
-ind.typical.M = matrix( c(313, 7,
-                           515, 7,
-                           818,7,
-                           327,4), 4, 2, byrow=TRUE)
+#initialize variables
+  init1 = c(N0,E0)
+  init2 = c(.03,.0015)
+  t.end = 40000
+  lt = t.end*2+1
+  times = seq(0, t.end, length.out = lt)
+  out1FE = array(NA, dim = c(5,lt,3))
+  out2FE = array(NA, dim = c(5,lt,3))
+  out1M = array(NA, dim = c(4,lt,3))
+  out2M = array(NA, dim = c(4,lt,3))
 
-init1 = c(N0,E0)
-init2 = c(.03,.0015)
-t.end = 40000
-lt = t.end*2+1
-times = seq(0, t.end, length.out = lt)
-out1FE = array(NA, dim = c(5,lt,3))
-out2FE = array(NA, dim = c(5,lt,3))
-out1M = array(NA, dim = c(4,lt,3))
-out2M = array(NA, dim = c(4,lt,3))
-
-# FE ODE solves (trajectories)
+## Solve for typical ODE trajectories in the cases where legal ivory trade funds enforcement
   for(counter in 1:5){
     print(counter)
     i = ind.typical.FE[counter,1] 
@@ -213,8 +221,7 @@ out2M = array(NA, dim = c(4,lt,3))
                  parms = pars, hmax=.0005)
   }
 
-## M ODE solves (trajectories)
-  strat='M'
+## Solve for typical ODE trajectories in the cases where legal ivory DOESN'T fund enforcement
   par(mfrow=c(3,2))
   for(counter in 1:4){
     i = ind.typical.M[counter,1] 
@@ -233,7 +240,7 @@ save.image('phasePlotData.Rdata')
 
 
 
-
+## plot the trajectories in the phase plane
 col.size = 3.4252
 pdf('PhasePlots.pdf', width=2*col.size, height=2*col.size)
   col.traj ='gray25'
@@ -242,22 +249,11 @@ pdf('PhasePlots.pdf', width=2*col.size, height=2*col.size)
   
   titlesM = c('(A)','(B)','(C)','(D)')
   titlesFE = c('(E)','(F)','(G)','(H)','(I)')
-  
-  # titlesM = c('low stable equilibrium', 
-  #            'low & high stable equilibria', 
-  #            'high stable equilibrium',
-  #            'carrying capacity')
-  # titlesFE = c('LTFE: low stable equilibrium', 
-  #            'LTFE: low & high stable equilibria', 
-  #            'LTFE: high stable equilibrium',
-  #            'LTFE: carrying capacity',
-  #            'LTFE: carrying capacity')
-  
   par(mfrow=c(3,3) , oma=c(4,4,0,0), mar = c(3,3,1.5,1) )
   options(scipen=999)
   step.a = round(.6*lt)
   step.a1 = round(.2*lt)
-  ## M phase plots
+  ## M phase plots (no funding enforcement with legal sales)
     strat='M'
     #par(mfrow=c(3,2))
     for(counter in 1:4){
@@ -273,10 +269,9 @@ pdf('PhasePlots.pdf', width=2*col.size, height=2*col.size)
       arrows(out1M[counter,lt-arrow.step,2], out1M[counter,lt-arrow.step,3],
             out1M[counter,lt,2], out1M[counter,lt,3], 
             lwd = lw.traj, col = col.traj, length = .15, xpd=TRUE)
-      #lines(out2M[counter,,2], out2M[counter,,3], col=col.traj, lwd=lw.traj, lty=2)
     }
   
-  ## FE phase plots
+  ## FE phase plots (funding enforcement with legal sales)
     strat='FE'
     for(counter in 1:5){
       i = ind.typical.FE[counter,1] 
@@ -290,7 +285,6 @@ pdf('PhasePlots.pdf', width=2*col.size, height=2*col.size)
       arrows(out1FE[counter,lt-step.a,2], out1FE[counter,lt-step.a,3],
              out1FE[counter,lt,2], out1FE[counter,lt,3], 
              lwd = lw.traj, col = col.traj, length = .15, xpd=TRUE)
-      #lines(out2FE[counter,,2], out2FE[counter,,3], col=col.traj, lwd=lw.traj, lty=2)
     }
     
     mtext(expression( paste('Elephants / km'^'2') ), 
